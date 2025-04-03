@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔒 Shalimar | Password Manager</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3a0ca3;
+      --accent: #f72585;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --danger: #ef233c;
+      --warning: #f8961e;
+      --info: #4895ef;
+      --gold: #FFD700;
+      --silver: #C0C0C0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 4rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, 
+        #FFD700 0%, 
+        #D4AF37 20%, 
+        #FDD017 40%, 
+        #FFDF00 60%, 
+        #D4AF37 80%, 
+        #CFB53B 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+      position: relative;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-shadow: 
+        0 2px 5px rgba(212, 175, 55, 0.4),
+        0 4px 15px rgba(212, 175, 55, 0.2),
+        0 0 0 4px rgba(212, 175, 55, 0.1);
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 4px;
+      background: linear-gradient(to right, var(--gold), var(--silver));
+      border-radius: 2px;
+      box-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      font-style: italic;
+      letter-spacing: 0.5px;
+    }
+
+    /* Form Styling */
+    .form-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .form-container:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      transform: translateY(-5px);
+    }
+
+    #passwordForm {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .input-group {
+      position: relative;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 20px 12px 45px;
+      font-size: 1rem;
+      border-radius: 50px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--light);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    button {
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(67, 97, 238, 0.5);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    /* Password Generator Section */
+    .generator-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .generator-container:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      transform: translateY(-5px);
+    }
+
+    .generator-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .generator-header h2 {
+      font-size: 1.5rem;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .generator-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .option-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .option-group label {
+      font-size: 0.9rem;
+    }
+
+    .generator-result {
+      display: flex;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    #generatedPassword {
+      flex: 1;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      cursor: text;
+    }
+
+    #generatedPassword:focus {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+    }
+
+    /* Table Styling */
+    .table-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      color: var(--light);
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.1);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Button Styling for Rows */
+    .btn {
+      padding: 8px 15px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: none;
+      font-weight: 500;
+    }
+
+    .btn i {
+      font-size: 0.9rem;
+    }
+
+    .view-btn {
+      background: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .view-btn:hover {
+      background: rgba(76, 201, 240, 0.2);
+    }
+
+    .copy-btn {
+      background: rgba(72, 149, 239, 0.1);
+      color: var(--info);
+      border: 1px solid var(--info);
+    }
+
+    .copy-btn:hover {
+      background: rgba(72, 149, 239, 0.2);
+    }
+
+    .toggle-btn {
+      background: rgba(248, 150, 30, 0.1);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .toggle-btn:hover {
+      background: rgba(248, 150, 30, 0.2);
+    }
+
+    .edit-btn {
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .edit-btn:hover {
+      background: rgba(67, 97, 238, 0.2);
+    }
+
+    .save-btn {
+      background: rgba(76, 201, 240, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .save-btn:hover {
+      background: rgba(76, 201, 240, 0.3);
+    }
+
+    .delete-btn {
+      background: rgba(239, 35, 60, 0.1);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .delete-btn:hover {
+      background: rgba(239, 35, 60, 0.2);
+    }
+
+    /* Details Styling */
+    .details {
+      display: none;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      margin-top: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .details.open {
+      display: block;
+    }
+
+    .details p {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .details p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Entry Number Styling */
+    .entry-number {
+      font-weight: bold;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 50px;
+      text-align: center;
+      display: inline-block;
+      min-width: 30px;
+    }
+
+    /* Password visibility toggle */
+    .hidden-password {
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+    }
+
+    /* Edit Mode Styling */
+    .edit-mode input {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 15px;
+      margin-right: 10px;
+      flex: 1;
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast i {
+      font-size: 1.2rem;
+    }
+
+    .toast.success i {
+      color: var(--success);
+    }
+
+    .toast.error i {
+      color: var(--danger);
+    }
+
+    /* Master Password Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .modal-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .modal-container h2 {
+      margin-bottom: 1.5rem;
+      color: var(--gold);
+    }
+
+    .modal-container p {
+      margin-bottom: 1.5rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .modal-container input {
+      width: 100%;
+      padding: 12px 20px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .modal-container button {
+      width: 100%;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 2.5rem;
+      }
+      
+      .form-container, .table-container, .generator-container {
+        padding: 1.5rem;
+      }
+      
+      th, td {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      
+      .btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+      
+      .input-group {
+        min-width: 100%;
+      }
+      
+      .generator-options {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #passwordForm {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .details p {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .edit-mode input {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+      }
+      
+      .generator-result {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Master Password Modal -->
+  <div id="masterPasswordModal" class="modal-overlay">
+    <div class="modal-container">
+      <h2><i class="fas fa-lock"></i> Enter Master Password</h2>
+      <p>Please enter the master password to access your vault</p>
+      <input type="password" id="masterPasswordInput" placeholder="Master Password">
+      <button onclick="checkMasterPassword()">
+        <i class="fas fa-unlock"></i> Unlock Vault
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content (hidden until authenticated) -->
+  <div id="mainContent" class="container" style="display: none;">
+    <header>
+      <h1 class="floating">SHALIMAR</h1>
+      <p class="subtitle">Welcome to the land of locked-down chaos</p>
+    </header>
+
+    <!-- Password Generator Section -->
+    <div class="generator-container">
+      <div class="generator-header">
+        <h2><i class="fas fa-key"></i> Password Generator</h2>
+      </div>
+      <div class="generator-options">
+        <div class="option-group">
+          <input type="number" id="length" min="8" max="32" value="16">
+          <label for="length">Length</label>
+        </div>
+        <div class="option-group">
+          <input type="checkbox" id="uppercase" checked>
+          <label for="uppercase">Uppercase (A-Z)</label>
+        </div>
+        <div class="option-group">
+          <input type="checkbox" id="lowercase" checked>
+          <label for="lowercase">Lowercase (a-z)</label>
+        </div>
+        <div class="option-group">
+          <input type="checkbox" id="numbers" checked>
+          <label for="numbers">Numbers (0-9)</label>
+        </div>
+        <div class="option-group">
+          <input type="checkbox" id="symbols" checked>
+          <label for="symbols">Symbols (!@#$)</label>
+        </div>
+      </div>
+      <button class="btn" onclick="generatePassword()">
+        <i class="fas fa-random"></i> Generate Password
+      </button>
+      <div class="generator-result">
+        <input type="text" id="generatedPassword" placeholder="Your generated password will appear here">
+        <button class="btn copy-btn" onclick="copyGeneratedPassword()">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- Add Credentials Form -->
+    <div class="form-container">
+      <form id="passwordForm">
+        <div class="input-group">
+          <i class="fas fa-globe"></i>
+          <input type="text" id="site" placeholder="Website or App" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" id="email" placeholder="Email or Username" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" placeholder="Password" required>
+        </div>
+        <button type="submit">
+          <i class="fas fa-plus"></i> Add Credential
+        </button>
+      </form>
+    </div>
+
+    <!-- Password Table -->
+    <div class="table-container">
+      <div class="search-container">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search your vault...">
+      </div>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Site</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="passwordTable">
+          <!-- Password entries will appear here -->
+        </tbody>
+      </table>
+      
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <i class="fas fa-unlock-alt"></i>
+        <h3>Your vault is empty</h3>
+        <p>Add your first credential to get started</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Copied to clipboard!</span>
+  </div>
+
+  <script>
+    // Master Password Configuration
+    const MASTER_PASSWORD = "Prime2708@Asher!";
+
+    // Check master password
+    function checkMasterPassword() {
+      const input = document.getElementById('masterPasswordInput').value;
+      if (input === MASTER_PASSWORD) {
+        document.getElementById('masterPasswordModal').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        loadEntries();
+      } else {
+        alert('Incorrect master password! Please try again.');
+        document.getElementById('masterPasswordInput').value = '';
+      }
+    }
+
+    // Show master password modal when page loads or gains focus
+    function showAuthModal() {
+      document.getElementById('masterPasswordModal').style.display = 'flex';
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('masterPasswordInput').value = '';
+      document.getElementById('masterPasswordInput').focus();
+    }
+
+    // Check authentication when page loads
+    window.addEventListener('load', showAuthModal);
+
+    // Check authentication when page gains focus
+    window.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        showAuthModal();
+      }
+    });
+
+    // The rest of your existing JavaScript code
+    const form = document.getElementById('passwordForm');
+    const table = document.getElementById('passwordTable');
+    const searchInput = document.getElementById('searchInput');
+    const emptyState = document.getElementById('emptyState');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    const generatedPasswordInput = document.getElementById('generatedPassword');
+    
+    let passwordEntries = JSON.parse(localStorage.getItem('passwordEntries')) || [];
+    
+    // Icon mapping with more services
+    const iconMap = {
+      'google': 'fab fa-google', 'gmail': 'fas fa-envelope', 'microsoft': 'fab fa-microsoft', 
+      'outlook': 'fas fa-envelope', 'yahoo': 'fas fa-envelope', 'apple': 'fab fa-apple', 
+      'icloud': 'fas fa-cloud', 'facebook': 'fab fa-facebook', 'twitter': 'fab fa-twitter', 
+      'instagram': 'fab fa-instagram', 'linkedin': 'fab fa-linkedin', 'github': 'fab fa-github', 
+      'amazon': 'fab fa-amazon', 'netflix': 'fas fa-film', 'spotify': 'fab fa-spotify', 
+      'dropbox': 'fab fa-dropbox', 'slack': 'fab fa-slack', 'zoom': 'fas fa-video', 
+      'paypal': 'fab fa-paypal', 'bank': 'fas fa-university', 'credit': 'far fa-credit-card',
+      'reddit': 'fab fa-reddit', 'discord': 'fab fa-discord', 'twitch': 'fab fa-twitch',
+      'steam': 'fab fa-steam', 'ebay': 'fab fa-ebay', 'airbnb': 'fab fa-airbnb',
+      'android': 'fab fa-android', 'windows': 'fab fa-windows', 'linux': 'fab fa-linux',
+      'gitlab': 'fab fa-gitlab', 'bitbucket': 'fab fa-bitbucket', 'docker': 'fab fa-docker',
+      'npm': 'fab fa-npm', 'wordpress': 'fab fa-wordpress', 'chrome': 'fab fa-chrome',
+      'firefox': 'fab fa-firefox', 'safari': 'fab fa-safari', 'opera': 'fab fa-opera',
+      'edge': 'fab fa-edge', 'whatsapp': 'fab fa-whatsapp', 'telegram': 'fab fa-telegram',
+      'signal': 'fas fa-comment', 'skype': 'fab fa-skype', 'viber': 'fab fa-viber',
+      'wechat': 'fab fa-weixin', 'line': 'fab fa-line', 'tiktok': 'fab fa-tiktok',
+      'pinterest': 'fab fa-pinterest', 'tumblr': 'fab fa-tumblr', 'flickr': 'fab fa-flickr',
+      'quora': 'fab fa-quora', 'medium': 'fab fa-medium', 'blogger': 'fab fa-blogger',
+      'wordpress': 'fab fa-wordpress', 'joomla': 'fab fa-joomla', 'drupal': 'fab fa-drupal',
+      'wikipedia': 'fab fa-wikipedia-w', 'yelp': 'fab fa-yelp', 'tripadvisor': 'fab fa-tripadvisor',
+      'foursquare': 'fab fa-foursquare', 'swarm': 'fab fa-foursquare', 'meetup': 'fab fa-meetup',
+      'eventbrite': 'fab fa-eventbrite', 'kickstarter': 'fab fa-kickstarter', 'patreon': 'fab fa-patreon',
+      'producthunt': 'fab fa-product-hunt', 'shopify': 'fab fa-shopify', 'etsy': 'fab fa-etsy',
+      'ebay': 'fab fa-ebay', 'amazon': 'fab fa-amazon', 'alibaba': 'fab fa-alipay',
+      'aliexpress': 'fas fa-shopping-cart', 'walmart': 'fas fa-shopping-cart', 'target': 'fas fa-shopping-cart',
+      'bestbuy': 'fas fa-shopping-cart', 'homedepot': 'fas fa-home', 'lowes': 'fas fa-home',
+      'ikea': 'fas fa-couch', 'wayfair': 'fas fa-couch', 'overstock': 'fas fa-couch',
+      'zillow': 'fas fa-home', 'realtor': 'fas fa-home', 'redfin': 'fas fa-home',
+      'trulia': 'fas fa-home', 'zillow': 'fas fa-home', 'realtor': 'fas fa-home',
+      'expedia': 'fas fa-plane', 'kayak': 'fas fa-plane', 'orbitz': 'fas fa-plane',
+      'priceline': 'fas fa-plane', 'hotels': 'fas fa-hotel', 'booking': 'fas fa-hotel',
+      'airbnb': 'fab fa-airbnb', 'vrbo': 'fas fa-home', 'homeaway': 'fas fa-home',
+      'tripadvisor': 'fab fa-tripadvisor', 'lonelyplanet': 'fas fa-globe-americas',
+      'nationalgeographic': 'fas fa-globe-americas', 'discovery': 'fas fa-tv',
+      'hbo': 'fab fa-hbo', 'netflix': 'fas fa-film', 'hulu': 'fas fa-tv',
+      'disney': 'fas fa-tv', 'amazonprime': 'fab fa-amazon', 'apple tv': 'fab fa-apple',
+      'youtube': 'fab fa-youtube', 'vimeo': 'fab fa-vimeo', 'dailymotion': 'fas fa-play',
+      'soundcloud': 'fab fa-soundcloud', 'bandcamp': 'fab fa-bandcamp', 'mixcloud': 'fab fa-mixcloud',
+      'deezer': 'fas fa-music', 'tidal': 'fas fa-music', 'pandora': 'fas fa-music',
+      'last.fm': 'fab fa-lastfm', 'shazam': 'fas fa-music', 'spotify': 'fab fa-spotify',
+      'itunes': 'fab fa-itunes-note', 'google play': 'fab fa-google-play',
+      'default': 'fas fa-key'
+    };
+
+    function getIconForSite(siteName) {
+      const lowerSite = siteName.toLowerCase();
+      for (const [key, icon] of Object.entries(iconMap)) {
+        if (lowerSite.includes(key)) return icon;
+      }
+      return iconMap['default'];
+    }
+
+    // Show toast notification
+    function showToast(message, isSuccess = true) {
+      toastMessage.textContent = message;
+      toast.className = isSuccess ? 'toast success' : 'toast error';
+      toast.querySelector('i').className = isSuccess ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+      
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Load saved entries on page load
+    function loadEntries(filter = '') {
+      table.innerHTML = '';
+      const filteredEntries = passwordEntries.filter(entry => 
+        entry.site.toLowerCase().includes(filter.toLowerCase()) || 
+        entry.email.toLowerCase().includes(filter.toLowerCase())
+      );
+      
+      if (filteredEntries.length === 0) {
+        emptyState.style.display = 'block';
+      } else {
+        emptyState.style.display = 'none';
+        filteredEntries.forEach((entry, index) => {
+          const icon = getIconForSite(entry.site);
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><span class="entry-number">${index + 1}</span></td>
+            <td>
+              <button class="btn view-btn" onclick="toggleDetails(this)">
+                <i class="${icon}"></i> ${entry.site}
+              </button>
+              <div class="details">
+                <p>
+                  <i class="fas fa-envelope"></i> Email: 
+                  <span class="email-display">${entry.email}</span>
+                  <button class="btn copy-btn" onclick="copyToClipboard('${entry.email.replace(/'/g, "\\'")}', 'Email copied!')">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </p>
+                <p>
+                  <i class="fas fa-key"></i> Password: 
+                  <span class="hidden-password">*****</span>
+                  <button class="btn toggle-btn" data-password="${entry.password.replace(/'/g, "\\'")}" onclick="togglePassword(this)">
+                    <i class="fas fa-eye"></i> Show
+                  </button>
+                  <button class="btn copy-btn" onclick="copyToClipboard('${entry.password.replace(/'/g, "\\'")}', 'Password copied!')">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </p>
+                <div class="edit-actions">
+                  <button class="btn edit-btn" onclick="enableEditMode(this, ${index})">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button class="btn delete-btn" onclick="deleteEntry(${index})">
+                    <i class="fas fa-trash-alt"></i> Delete
+                  </button>
+                </div>
+              </div>
+            </td>
+            <td>
+              <button class="btn copy-btn" onclick="copyToClipboard('${entry.password.replace(/'/g, "\\'")}', 'Password copied!')">
+                <i class="fas fa-key"></i> Copy Password
+              </button>
+              <button class="btn copy-btn" onclick="copyToClipboard('${entry.email.replace(/'/g, "\\'")}', 'Email copied!')">
+                <i class="fas fa-envelope"></i> Copy Email
+              </button>
+              <button class="btn delete-btn" onclick="deleteEntry(${index})">
+                <i class="fas fa-trash-alt"></i> Delete
+              </button>
+            </td>
+          `;
+          table.appendChild(row);
+        });
+      }
+    }
+
+    // Save entries to localStorage
+    function saveEntries() {
+      localStorage.setItem('passwordEntries', JSON.stringify(passwordEntries));
+    }
+
+    // Form submission
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const site = document.getElementById('site').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      passwordEntries.push({ site, email, password });
+      saveEntries();
+      loadEntries();
+      form.reset();
+      showToast('Credential added successfully!');
+    });
+
+    // Search functionality
+    searchInput.addEventListener('input', (e) => {
+      loadEntries(e.target.value);
+    });
+
+    // Delete an entry
+    function deleteEntry(index) {
+      if (confirm('Are you sure you want to delete this entry?')) {
+        passwordEntries.splice(index, 1);
+        saveEntries();
+        loadEntries(searchInput.value);
+        showToast('Credential deleted successfully!');
+      }
+    }
+
+    // Helper functions
+    function toggleDetails(button) {
+      const details = button.nextElementSibling;
+      details.classList.toggle('open');
+    }
+
+    function togglePassword(button) {
+      const passwordSpan = button.previousElementSibling;
+      const password = button.dataset.password;
+      const icon = button.querySelector('i');
+      
+      if (passwordSpan.textContent === '*****') {
+        passwordSpan.textContent = password;
+        button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+      } else {
+        passwordSpan.textContent = '*****';
+        button.innerHTML = '<i class="fas fa-eye"></i> Show';
+      }
+    }
+
+    function copyToClipboard(text, message = 'Copied to clipboard!') {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(message);
+      }).catch(err => {
+        showToast('Failed to copy!', false);
+        console.error('Failed to copy: ', err);
+      });
+    }
+
+    function enableEditMode(button, index) {
+      const detailsDiv = button.closest('.details');
+      const entry = passwordEntries[index];
+      detailsDiv.classList.add('edit-mode');
+      detailsDiv.innerHTML = `
+        <p>
+          <i class="fas fa-envelope"></i> Email: 
+          <input type="text" class="edit-email" value="${entry.email.replace(/"/g, '&quot;')}">
+        </p>
+        <p>
+          <i class="fas fa-key"></i> Password: 
+          <input type="password" class="edit-password" value="${entry.password.replace(/"/g, '&quot;')}">
+        </p>
+        <div class="edit-actions">
+          <button class="btn save-btn" onclick="saveChanges(this, ${index})">
+            <i class="fas fa-save"></i> Save
+          </button>
+          <button class="btn edit-btn" onclick="cancelEdit(this, ${index})">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+        </div>
+      `;
+    }
+
+    function saveChanges(button, index) {
+      const detailsDiv = button.closest('.details');
+      const newEmail = detailsDiv.querySelector('.edit-email').value;
+      const newPassword = detailsDiv.querySelector('.edit-password').value;
+
+      if (!newEmail || !newPassword) {
+        showToast('Both fields are required!', false);
+        return;
+      }
+
+      passwordEntries[index] = {
+        site: passwordEntries[index].site,
+        email: newEmail,
+        password: newPassword
+      };
+      saveEntries();
+      loadEntries(searchInput.value);
+      showToast('Changes saved successfully!');
+    }
+
+    function cancelEdit(button, index) {
+      loadEntries(searchInput.value);
+    }
+
+    // Generate a strong password
+    function generatePassword() {
+      const length = parseInt(document.getElementById('length').value) || 16;
+      const includeUppercase = document.getElementById('uppercase').checked;
+      const includeLowercase = document.getElementById('lowercase').checked;
+      const includeNumbers = document.getElementById('numbers').checked;
+      const includeSymbols = document.getElementById('symbols').checked;
+      
+      let chars = '';
+      let password = '';
+      
+      if (includeUppercase) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      if (includeLowercase) chars += 'abcdefghijklmnopqrstuvwxyz';
+      if (includeNumbers) chars += '0123456789';
+      if (includeSymbols) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+      
+      if (!chars) {
+        showToast('Please select at least one character type!', false);
+        return;
+      }
+      
+      for (let i = 0; i < length; i++) {
+        const randomNumber = Math.floor(Math.random() * chars.length);
+        password += chars.substring(randomNumber, randomNumber + 1);
+      }
+      
+      generatedPasswordInput.value = password;
+      showToast('Strong password generated!');
+    }
+
+    function copyGeneratedPassword() {
+      if (!generatedPasswordInput.value) {
+        showToast('No password to copy!', false);
+        return;
+      }
+      copyToClipboard(generatedPasswordInput.value, 'Password copied to clipboard!');
+    }
+
+    // Listen for Enter key in master password input
+    document.getElementById('masterPasswordInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkMasterPassword();
+      }
+    });
+  </script>
+</body>
+</html>
