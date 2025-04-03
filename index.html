@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Password Manager</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="auth-container">
+    <h1>Secure Password Manager</h1>
+    <button id="google-signin" class="auth-btn">
+      <img src="/images/google-logo.png" alt="Google">
+      Sign in with Google
+    </button>
+  </div>
+
+  <div id="app-container" style="display: none;">
+    <!-- Your existing password manager UI here -->
+    <button id="signout-btn">Sign Out</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
